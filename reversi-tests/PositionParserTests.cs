@@ -1,19 +1,9 @@
 namespace IntroToGameDev.Reversi
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
     using NUnit.Framework;
 
-    public class Tests
-    {
-        [Test]
-        public void FactoryShouldCreateCorrectStartField()
-        {
-            Assert.Pass();
-        }
-    }
-
+    [TestFixture]
     public class PositionParserTests
     {
         private readonly IPositionParser parser = new PositionParser();

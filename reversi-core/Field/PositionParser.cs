@@ -1,8 +1,12 @@
 ﻿namespace IntroToGameDev.Reversi
 {
+    using System;
+
     public interface IPositionParser
     {
         Position? TryParse(string code);
+
+        Position Parse(string code);
     }
     
     public class PositionParser : IPositionParser
@@ -27,6 +31,17 @@
             }
 
             return null;
+        }
+
+        public Position Parse(string code)
+        {
+            var result = TryParse(code);
+            if (result.HasValue)
+            {
+                return result.Value;
+            }
+            
+            throw new Exception($"Can not parse {code}");
         }
     }
 }
