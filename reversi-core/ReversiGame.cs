@@ -24,6 +24,12 @@
 
         public ValueOrError<bool> MakeMove(string move)
         {
+            if (move == "pass")
+            {
+                CurrentColor = CurrentColor.Opposite();
+                return ValueOrError.FromValue<bool>(true);
+            }
+            
             var position = parser.TryParse(move);
             if (!position.HasValue)
             {
