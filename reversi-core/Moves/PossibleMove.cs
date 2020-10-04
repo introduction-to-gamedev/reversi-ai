@@ -35,8 +35,11 @@
         {
             return HashCode.Combine(Position, (int) Color);
         }
-        
-        
+
+        public override string ToString()
+        {
+            return $"{Position.ToCode()} ({Color})";
+        }
     }
 
     public static class PositionExtensions

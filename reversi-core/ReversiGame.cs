@@ -10,6 +10,17 @@
 
         public bool IsOver => !possibleMovesFinder.GetPossibleMoves(Field).Any();
 
+        public Color CurrentWinner
+        {
+            get
+            {
+                var black = GetScoreFor(Color.Black);
+                var white = GetScoreFor(Color.White);
+
+                return black > white ? Color.Black : Color.White;
+            }
+        }
+
         public Color CurrentColor { get; private set; } = Color.Black;
         
         private readonly IPossibleMovesFinder possibleMovesFinder = new PossibleMovesFinder();
@@ -20,7 +31,12 @@
         {
             Field = field;
         }
-
+        
+        public int GetScoreFor(Color color)
+        {
+            return Field.AllCells().Select(tuple => tuple.Item2)
+                .Count(cell => cell.HasPiece && cell.Piece.Color == color);
+        }
 
         public ValueOrError<bool> MakeMove(string move)
         {

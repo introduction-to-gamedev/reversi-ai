@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace reversi_ai_client
+namespace IntroToGameDev.Reversi.Client
 {
     using System.Linq;
     using IntroToGameDev.Reversi;
@@ -11,9 +11,7 @@ namespace reversi_ai_client
         static void Main(string[] args)
         {
             var blackHole = ReadCoordinates();
-
             var myColor = ReadColor();
-            
             var game = new ReversiGame(new GameFieldFactory().PrepareField());
 
             if (myColor == Color.Black)
@@ -36,18 +34,26 @@ namespace reversi_ai_client
 
         private static void GetOpponentsMove(ReversiGame game)
         {
-            game.MakeMove(Console.ReadLine());
+            string nextMove = null;
+            while (nextMove == null)
+            {
+                nextMove = Console.ReadLine();    
+            }
+            game.MakeMove(nextMove);
         }
 
         private static void MakeMove(ReversiGame reversiGame, Color myColor)
         {
             var moves = new PossibleMovesFinder().GetPossibleMoves(reversiGame.Field).Where(move => move.Color == myColor).ToList();
+            // Console.WriteLine($"//{string.Join(",", moves)}, {reversiGame.Field.GetCell("B4").Piece?.Color}");
             if (!moves.Any())
             {
                 Console.WriteLine("pass");
+                reversiGame.MakeMove("pass");
                 return;
             }
             
+          
             var move = moves.First();
             var code = move.Position.ToCode();
             reversiGame.MakeMove(code);
@@ -67,7 +73,7 @@ namespace reversi_ai_client
                 return Color.Black;
             }
 
-            throw new ArgumentException();
+            throw new ArgumentException($"{line} is not a valid color");
         }
 
         private static Position ReadCoordinates()

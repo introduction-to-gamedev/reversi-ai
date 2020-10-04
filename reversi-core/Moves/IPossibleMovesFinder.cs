@@ -11,39 +11,26 @@
 
     public class PossibleMovesFinder : IPossibleMovesFinder
     {
+        private readonly StreakFinder streakFinder = new StreakFinder();
+        
         public IEnumerable<PossibleMove> GetPossibleMoves(ReversiField field)
         {
-            var directionOffsets = new List<Position>()
-            {
-                (1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)
-            };
             foreach (var (position, cell) in field.AllCells())
             {
                 if (cell.HasPiece)
                 {
                     continue;
                 }
-
-                foreach (var offset in directionOffsets)
+                var streaks = streakFinder.GetStreaksFor(position, field);
+                foreach (var streak in streaks)
                 {
-                    var streak = new List<Cell>();
-                    Cell next;
-                    var nextPosition = position;
-                    do
+                    var firstPoint = streak[0];
+                    var firstPieceOppositeColor = firstPoint.Piece.Color.Opposite();
+                    if (streak.Count > 1 &&
+                        streak.Any(c => c.HasPiece && c.Piece.Color == firstPieceOppositeColor))
                     {
-                        nextPosition += offset;
-                        next = field.GetCell(nextPosition);
-                        if (next != null && next.HasPiece)
-                        {
-                            streak.Add(next);
-                            continue;
-                        }
-                        if (streak.Any(c => c.Piece.Color == Color.White) &&
-                            streak.Any(c => c.Piece.Color == Color.Black))
-                        {
-                            yield return new PossibleMove(position, streak.First().Piece.Color.Opposite());
-                        }
-                    } while (next != null && next.HasPiece);
+                        yield return new PossibleMove(position, firstPieceOppositeColor);
+                    }
                 }
             }
         }
@@ -53,10 +40,17 @@
     {
         public IEnumerable<List<Cell>> GetStreaksFor(Position origin, ReversiField field)
         {
-            var directionOffsets = new List<Position>()
+            var directionOffsets = new List<Position>();
+            for (var x = -1; x <= 1; x++)
             {
-                (1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)
-            };
+                for (var y = -1; y <= 1; y++)
+                {
+                    if (x != 0 || y != 0)
+                    {
+                        directionOffsets.Add(new Position(x, y));
+                    }
+                }
+            }
             
             foreach (var offset in directionOffsets)
             {
@@ -73,7 +67,10 @@
                     }
                 } while (next != null && next.HasPiece);
 
-                yield return streak;
+                if (streak.Any())
+                {
+                    yield return streak;
+                }
             }
         }
     }

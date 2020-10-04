@@ -1,28 +1,36 @@
-﻿using System;
-
-namespace reversi_ai_tester
+﻿namespace IntroToGameDev.Reversi.Tester
 {
+    using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
-    using IntroToGameDev.Reversi;
+    using System.Threading.Tasks;
+    using CommandLine;
+    using Options;
 
     class Program
     {
-        private static CancellationTokenSource token = new CancellationTokenSource();
-
-        static void Main(string[] args)
+        async static Task Main(string[] args)
         {
-            new ReversiTester().ExecuteSingleTest();
+            Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(ExecuteTests);
         }
 
-        private static void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private static async void ExecuteTests(CommandLineOptions options)
         {
-            throw new NotImplementedException();
-        }
+            // if (options.SingleRun)
+            // {
+            //     Console.WriteLine("Executing single run...");
+            //     var result = await new ReversiTester().ExecuteSingleTest(options.RunCommand);
+            //     Console.WriteLine($"{result.Type} {result.Error}");
+            //     return;
+            // }
 
-        private static void OnExited(object? sender, EventArgs e)
-        {
-            token.Cancel();
+            Console.WriteLine("Executing full test...");
+
+            var aggregated = new ResultsAggregator().Aggregate(await Task.WhenAll(Enumerable.Range(1, 10)
+                .Select(index => new ReversiTester().ExecuteSingleTest(options.RunCommand))));
+            
+            Console.WriteLine(aggregated);
         }
     }
 }

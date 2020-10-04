@@ -13,6 +13,11 @@
     {
         public Position? TryParse(string code)
         {
+            if (code == null)
+            {
+                return null;
+            }
+            
             code = code.ToLower();
             if (code.Length != 2)
             {
