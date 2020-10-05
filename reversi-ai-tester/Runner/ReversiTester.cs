@@ -7,8 +7,12 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using Moves;
+    using NLog;
     using Utils;
+    using ILogger = NLog.ILogger;
+    using LogLevel = NLog.LogLevel;
 
     public class ReversiTester
     {
@@ -16,6 +20,13 @@
             new TaskCompletionSource<SingleTestResult>();
         
         private readonly StringBuilder errorsBuilder = new StringBuilder();
+
+        private readonly ILogger logger;
+
+        public ReversiTester(Logger logger)
+        {
+            this.logger = logger;
+        }
 
         public async Task<SingleTestResult> ExecuteSingleTest(string command)
         {
@@ -96,7 +107,7 @@
                         line = await output.ReadLineAsync();
                     }
 
-                    Console.WriteLine($"<- {line}");
+                    logger.Log(LogLevel.Info, $"<- {line}");
 
                     if (moves1.Any() && line == "pass")
                     {
@@ -110,7 +121,7 @@
                     var move = moves.First().Position.ToCode();
                     var result = game.MakeMove(move);
 
-                    Console.WriteLine($"-> {move}");
+                    logger.Log(LogLevel.Info, $"-> {move}");
                     await input.WriteLineAsync(move);
                 }
 
