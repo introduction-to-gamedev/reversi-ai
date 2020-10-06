@@ -2,12 +2,12 @@
 {
     public interface IGameFieldFactory
     {
-        ReversiField PrepareField();
+        ReversiField PrepareField(Position? blackHole = null);
     }
 
     public class GameFieldFactory : IGameFieldFactory
     {
-        public ReversiField PrepareField()
+        public ReversiField PrepareField(Position? blackHole = null)
         {
             var size = 8;
             var cells = new Cell[size,size];
@@ -15,7 +15,11 @@
             {
                 for (int column = 0; column < size; column++)
                 {
-                    cells[row, column] = new Cell();  
+                    var position = new Position(row, column);
+                    if (position != blackHole)
+                    {
+                        cells[row, column] = new Cell();
+                    }  
                 }
             }
             

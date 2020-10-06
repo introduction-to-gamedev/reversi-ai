@@ -12,7 +12,7 @@
         {
             var blackHole = ReadCoordinates();
             var myColor = ReadColor();
-            var game = new ReversiGame(new GameFieldFactory().PrepareField());
+            var game = new ReversiGame(new GameFieldFactory().PrepareField(blackHole));
 
             if (myColor == Color.Black)
             {

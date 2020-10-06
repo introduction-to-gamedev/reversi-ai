@@ -23,13 +23,17 @@
             this.cells = cells;
         }
 
-        public IEnumerable<(Position, Cell)> AllCells()
+        public IEnumerable<(Position position, Cell cell)> AllCells()
         {
             for (var row = 0; row < Height; row++)
             {
                 for (var column = 0; column < Width; column++)
                 {
-                    yield return (new Position(row, column), cells[row, column]);
+                    var cell = cells[row, column];
+                    if (cell != null)
+                    {
+                        yield return (new Position(row, column), cell);
+                    }
                 }
             }
         }

@@ -48,13 +48,22 @@
             var playTask = Play(process);
 
             process.WaitForExit();
+
+            var testResult = playTask.Result;
+            if (!testResult.IsCompletedSuccessfully)
+            {
+                logger.Log(LogLevel.Error, testResult.Error);
+                return testResult;
+            }
             
             if (errorsBuilder.Length > 0)
             {
-                return SingleTestResult.FromError(errorsBuilder.ToString());
+                var errorMessage = errorsBuilder.ToString();
+                logger.Log(LogLevel.Error, errorMessage);
+                return SingleTestResult.FromError(errorMessage);
             }
-
-            return playTask.Result;
+            
+            return testResult;
         }
 
         private void OnProcessOnExited(object? sender, EventArgs args)
@@ -64,16 +73,15 @@
 
         private async Task<SingleTestResult> Play(Process process)
         {
+            var gameFieldFactory = new GameFieldFactory();
             try
             {
                 var random = new Random();
                 var output = process.StandardOutput;
                 var input = process.StandardInput;
 
-                var game = new ReversiGame(new GameFieldFactory().PrepareField());
-
-                await input.WriteLineAsync("A5");
-
+                var game = new ReversiGame(gameFieldFactory.PrepareField(await SetUpBlackHole()));
+                
                 var playersColor = random.NextDouble() > .5? Color.Black : Color.White;
                 logger.Log(LogLevel.Info, $"Chosen color for player: {playersColor}");
                 await input.WriteLineAsync(playersColor.ToString().ToLower());
@@ -105,6 +113,11 @@
                         return SingleTestResult.FromError("Error: can not pass when possible moves are available");
                     }
 
+                    if (possibleMoves.All(move => move.Position.ToCode() != line) && line != "pass")
+                    {
+                        return SingleTestResult.FromError($"Error: can not make move to {line}");
+                    }
+
                     game.MakeMove(line);
 
                     await PerformMove();
@@ -117,6 +130,15 @@
                 return new SingleTestResult(game.CurrentWinner == playersColor
                     ? TestResultType.Win
                     : TestResultType.Loss);
+
+                async Task<Position> SetUpBlackHole()
+                {
+                    var blackHoleVariants = gameFieldFactory.PrepareField().AllCells().Where(tuple => !tuple.cell.HasPiece).ToList();
+                    var blackHole = blackHoleVariants[random.Next(blackHoleVariants.Count)].position;
+                    logger.Log(LogLevel.Info, $"Black hole is chosen to: {blackHole.ToCode()}");
+                    await input.WriteLineAsync(blackHole.ToCode());
+                    return blackHole;
+                }
 
                 Task PerformMove()
                 {
