@@ -1,13 +1,13 @@
-﻿using System;
-
-namespace IntroToGameDev.Reversi.Client
+﻿namespace IntroToGameDev.Reversi.Client
 {
+    using System;
     using System.Linq;
-    using IntroToGameDev.Reversi;
-    using IntroToGameDev.Reversi.Moves;
+    using Moves;
 
     class Program
     {
+        static Random random = new Random();
+        
         static void Main(string[] args)
         {
             var blackHole = ReadCoordinates();
@@ -52,9 +52,8 @@ namespace IntroToGameDev.Reversi.Client
                 reversiGame.MakeMove("pass");
                 return;
             }
-            
           
-            var move = moves.First();
+            var move = moves[random.Next(moves.Count)];
             var code = move.Position.ToCode();
             reversiGame.MakeMove(code);
             Console.WriteLine(code);

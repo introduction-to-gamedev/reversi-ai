@@ -6,12 +6,14 @@
         
         public string Error { get; }
 
+        public bool IsCompletedSuccessfully => Type == TestResultType.Win || Type == TestResultType.Loss;
+
         public SingleTestResult(TestResultType type)
         {
             Type = type;
         }
 
-        private SingleTestResult(TestResultType type, string error)
+        public SingleTestResult(TestResultType type, string error)
         {
             Type = type;
             Error = error;
@@ -21,10 +23,11 @@
         {
             return new SingleTestResult(TestResultType.TechnicalLoss, error);
         }
+        
     }
 
     public enum TestResultType
     {
-        Win, Loss, TechnicalLoss
+        Win, Loss, TechnicalLoss, InternalError
     }
 }
