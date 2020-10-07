@@ -10,16 +10,7 @@
 
         public bool IsOver => !possibleMovesFinder.GetPossibleMoves(Field).Any();
 
-        public Color CurrentWinner
-        {
-            get
-            {
-                var black = GetScoreFor(Color.Black);
-                var white = GetScoreFor(Color.White);
-
-                return black > white ? Color.Black : Color.White;
-            }
-        }
+     
 
         public Color CurrentColor { get; private set; } = Color.Black;
         
