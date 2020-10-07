@@ -1,4 +1,4 @@
-# reversi-ai
+# Reversi AI Tester
 
 Usage of reversi-ai-tester executable:
 
