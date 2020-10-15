@@ -21,29 +21,37 @@
 
         private static async void ExecuteTests(CommandLineOptions options)
         {
-            SetUpLogging(options);
-            
             var logger = LogManager.LogFactory.GetLogger("Logger");
-
-            if (options.SingleRun)
+            
+            try
             {
-                logger.Log(LogLevel.Info, "Executing single run...");
-                var result = await new SingleTestExecutor(logger).Execute(options.RunCommand);
-                logger.Log(result.IsCompletedSuccessfully ? LogLevel.Error : LogLevel.Info, $"{result.Type} {result.Error}");
-                return;
-            }
+                SetUpLogging(options);
 
-            logger.Log(LogLevel.Info, "Executing full test...");
-
-            var aggregated = new ResultsAggregator().Aggregate(await Task.WhenAll(Enumerable.Range(1, 100)
-                .Select(index =>
+                if (options.SingleRun)
                 {
-                    logger.Log(LogLevel.Info, $"----------------------");
-                    logger.Log(LogLevel.Info, $"Executing run #{index}");
-                    return new SingleTestExecutor(logger).Execute(options.RunCommand);
-                })));
+                    logger.Log(LogLevel.Info, "Executing single run...");
+                    var result = await new SingleTestExecutor(logger).Execute(options.RunCommand);
+                    logger.Log(result.IsCompletedSuccessfully ? LogLevel.Error : LogLevel.Info, $"{result.Type} {result.Error}");
+                    return;
+                }
 
-            Console.WriteLine(aggregated);
+                logger.Log(LogLevel.Info, "Executing full test...");
+
+                var aggregated = new ResultsAggregator().Aggregate(await Task.WhenAll(Enumerable.Range(1, 100)
+                    .Select(index =>
+                    {
+                        logger.Log(LogLevel.Info, $"----------------------");
+                        logger.Log(LogLevel.Info, $"Executing run #{index}");
+                        return new SingleTestExecutor(logger).Execute(options.RunCommand);
+                    })));
+
+                Console.WriteLine(aggregated);
+            }
+            catch (Exception e)
+            {
+                logger.Log(LogLevel.Error, e);
+                throw;
+            }
         }
 
         private static void SetUpLogging(CommandLineOptions commandLineOptions)
