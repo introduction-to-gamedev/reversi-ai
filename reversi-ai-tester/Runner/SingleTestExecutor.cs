@@ -131,7 +131,7 @@
                 }
 
                 Console.WriteLine($"Black {game.GetScoreFor(Color.Black)} : {game.GetScoreFor(Color.White)} White");
-                return new SingleTestResult(game.CurrentWinner == playersColor
+                return new SingleTestResult(game.GetScoreFor(playersColor) < game.GetScoreFor(playersColor.Opposite())
                     ? TestResultType.Win
                     : TestResultType.Loss);
 

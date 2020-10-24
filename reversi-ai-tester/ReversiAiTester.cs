@@ -31,7 +31,7 @@
                 {
                     logger.Log(LogLevel.Info, "Executing single run...");
                     var result = await new SingleTestExecutor(logger).Execute(options.RunCommand);
-                    logger.Log(result.IsCompletedSuccessfully ? LogLevel.Error : LogLevel.Info, $"{result.Type} {result.Error}");
+                    logger.Log(result.IsCompletedSuccessfully ? LogLevel.Info : LogLevel.Error, $"{result.Type} {result.Error}");
                     return;
                 }
 
